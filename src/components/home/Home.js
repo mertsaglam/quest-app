@@ -45,7 +45,7 @@ function Home() {
       <div style={styles.container}>
         <PostForm userName={"userName"} userId={1} refreshPosts = {refreshPosts} />
         {postList.map(post => (
-          <Post postId={post.id} title={post.title} text={post.text} userName={post.userName} userId={post.userId} ></Post>
+          <Post likes={post.postLikes} postId={post.id} title={post.title} text={post.text} userName={post.userName} userId={post.userId} ></Post>
         ))}
       </div>)
   }

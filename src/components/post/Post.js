@@ -13,6 +13,10 @@ import { red } from "@mui/material/colors";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import CommentIcon from "@mui/icons-material/Comment";
 import { Link } from "react-router-dom";
+import Comment from "../comment/Comment";
+import { Container } from "@mui/material";
+import CommentForm from "../comment/CommentForm";
+
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -24,14 +28,16 @@ const ExpandMore = styled((props) => {
   }),
 }));
 function Post(props) {
-  const { title, text, userName, userId,postId } = props;
+  const { title, text, userName, userId,postId ,likes} = props;
   const [expanded, setExpanded] = useState(false);
-  const [liked, setLiked] = useState(false);
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [commentList, setCommentList] = useState([]);
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(likes.length);
   const firstLetter = userName.charAt(0).toUpperCase();
   const isInitialMount = useRef(true);
+
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -39,8 +45,45 @@ function Post(props) {
     console.log(commentList);
   };
   const handleLikeClick = () => {
-    setLiked(!liked);
+    setIsLiked(!isLiked);
+    if(isLiked){
+      setLikeCount(likeCount-1);
+      deleteLike(likes.find(like => like.userId == userId ).id);
+      
+    }else{
+      setLikeCount(likeCount+1);
+      saveLike();
+    }
   };
+
+  const saveLike = () => {
+    fetch("/likes", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        postId: postId,
+        userId: userId,
+      }),
+    });
+  };
+ //write the function to delete like
+  //@DeleteMapping("/{likeId}")
+  //public void deleteSingleLike(@PathVariable Long likeId){
+  //likeService.deleteSingleLike(likeId);
+  //}
+  const deleteLike = (likeId) => {
+    fetch("/likes/"+likeId, { 
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        likeId: likeId,
+      })
+    })
+  }
 
   const refreshComments = () => {
     fetch("/comments?postId="+postId)
@@ -56,6 +99,13 @@ function Post(props) {
         }
       );
   };
+  const checkLikes = () => {
+    var likeControl =likes.find(like => like.userId == userId )
+    if(likeControl != null){
+      setIsLiked(true);
+  }
+}
+      
   useEffect(() => {
     if(isInitialMount.current){
       isInitialMount.current = false;
@@ -63,6 +113,8 @@ function Post(props) {
     refreshComments();
     }
   }, [commentList]);
+
+  useEffect(() => { checkLikes() }, [])
   return (
     <Card sx={{ maxWidth: 800, width: "800px", margin: "20px auto" }}>
       <CardHeader
@@ -86,9 +138,9 @@ function Post(props) {
       <CardActions disableSpacing>
         <IconButton
           onClick={handleLikeClick}
-          sx={{ color: liked ? red[500] : "inherit" }}
+          sx={{ color: isLiked  ? red[500] : "inherit" }}
           aria-label="add to favorites"
-        >
+        > {likeCount}
           <FavoriteIcon />
         </IconButton>
 
@@ -102,10 +154,15 @@ function Post(props) {
         </ExpandMore>
       </CardActions>
       <Collapse in={expanded} timeout="auto" unmountOnExit>
-        <CardContent>
-          burası açılıp kapanan kısım. burası açılıp kapanan kısım. burası
-          açılıp kapanan kısım.
-        </CardContent>
+        <Container fixed className="comment-container" >
+          {error ? "error" : isLoaded ? commentList.map((comment) => (
+            <Comment userId={1} userName={"USER"} text={comment.text} >
+
+            </Comment>
+          )) : "loading"
+           }
+           <CommentForm userName={userName} userId={userId} postId={postId} refreshComments={refreshComments}></CommentForm>
+        </Container>
       </Collapse>
     </Card>
   );

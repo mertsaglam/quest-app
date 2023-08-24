@@ -1,43 +1,56 @@
-import { Avatar, CardContent, InputAdornment, OutlinedInput } from "@mui/material";
-import { makeStyles } from "@mui/styles";
-
-
-const useStyles = makeStyles({
-    comment: {
-        backgroundColor: "#dfe8f7",
-        margin: "10px",
-        padding: "10px",
-        borderRadius: "10px",
-        boxShadow: "0px 0px 10px 0px rgba(0,0,0,0.2)",
-        width: "100%"
-    }
-})
+import {
+  Avatar,
+  CardContent,
+  InputAdornment,
+  OutlinedInput,
+} from "@mui/material";
+import { Link } from "react-router-dom";
 
 const Comment = (props) => {
-    const { text, userId, userName } = props;
-    const classes = useStyles();
+  const { text, userId, userName } = props;
+
   return (
-    <CardContent className={classes.comment}>
-        <OutlinedInput disabled
+    <CardContent
+      sx={{
+        display: "flex",
+        flexWrap: "wrap",
+        justifyContent: "flex-start",
+        alignItems: "center",
+      }}
+    >
+      <OutlinedInput
+        disabled
         id="outlined-adornment-amount"
         multiline
         inputProps={{ maxLength: 25 }}
         fullWidth
         value={text}
         startAdornment={
-            <InputAdornment position="start">
-                <Link className={classes.link} to={{pathname:'/users/' + userId}}>
-                    <Avatar aria-label="recipe" className={classes.avatar}>
-                        {userName.charAt(0).toUpperCase()}
-                    </Avatar>
-
-                </Link>
-            </InputAdornment>
+          <InputAdornment position="start">
+            <Link
+              to={{ pathname: "/users/" + userId }}
+              sx={{
+                textDecoration: "none",
+                boxShadow: "none",
+                color: "white",
+              }}
+            >
+              <Avatar
+                aria-label="recipe"
+                sx={{
+                  width: (theme) => theme.spacing(3),
+                  height: (theme) => theme.spacing(3),
+                }}
+              >
+                {userName.charAt(0).toUpperCase()}
+              </Avatar>
+            </Link>
+          </InputAdornment>
         }
-        >
-
-        </OutlinedInput>
+        sx={{ color: "black", backgroundColor: "white" }}
+      ></OutlinedInput>
     </CardContent>
-  )
-}
-export default Comment
+  );
+};
+
+export default Comment;
