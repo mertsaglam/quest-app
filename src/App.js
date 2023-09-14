@@ -4,6 +4,7 @@ import Navbar from "./components/navbar/Navbar";
 import User from "./components/user/User";
 import Home from "./components/home/Home";
 import Auth from "./components/auth/Auth";
+import Post from "./components/post/Post";
 
 function App() {
   return (

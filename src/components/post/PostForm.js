@@ -27,12 +27,12 @@ function PostForm(props) {
     setIsSent(false);
   };
 
-  const savePost = () => {
-    fetch("/posts", {
+  const savePost = async () => {
+    const response = await fetch("/posts", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization":  localStorage.getItem("tokenKey"),
+        Authorization: localStorage.getItem("tokenKey"),
       },
       body: JSON.stringify({
         userId: userId,
@@ -40,14 +40,23 @@ function PostForm(props) {
         text: text,
       }),
     });
+    if (response.ok) {
+      const newPost = await response.json();
+      return newPost;
+    } else {
+      // Handle errors here
+      return null;
+    }
   };
 
-  const handleSubmit = () => {
-    savePost();
-    setIsSent(true);
-    setTitle("");
-    setText("");
-    refreshPosts();
+  const handleSubmit = async () => {
+    const newPost = await savePost();
+    if (newPost) {
+      setIsSent(true);
+      setTitle("");
+      setText("");
+      refreshPosts();
+    }
   };
 
   return (
@@ -58,7 +67,7 @@ function PostForm(props) {
         </Alert>
       </Snackbar>
 
-      <Card sx={{ maxWidth: 800, width: "800px", margin: "20px auto"}}>
+      <Card sx={{ maxWidth: 800, width: "800px", margin: "20px auto" }}>
         <CardHeader
           sx={{ textAlign: "left" }}
           avatar={

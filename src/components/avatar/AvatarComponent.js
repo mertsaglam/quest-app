@@ -15,17 +15,38 @@ import {
   ListItemSecondaryAction,
 } from "@mui/material";
 
-const AvatarComponent = () => {
+const AvatarComponent = (props) => {
+  const { avatarId } = props;
   const [open, setOpen] = useState(false);
-  const [selectedValue, setSelectedValue] = useState(null);
-  const [currentAvatar, setCurrentAvatar] = useState("/Avatars/avatar1.png"); // New state variable
+  const [selectedValue, setSelectedValue] = useState(avatarId);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
+  const handleSaveAvatar = (avatarId) => {
+  const userId = localStorage.getItem("currentUser");
+  console.log("userId", userId);
+  // Assuming you have userId in localStorage
+
+  fetch(`/users/${userId}/${avatarId}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: localStorage.getItem("tokenKey"),
+    },
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      // Handle the response data here
+      console.log("Avatar updated:", data);
+    })
+    .catch((error) => {
+      console.error("Error updating avatar:", error);
+    });
+};
+
   const handleChange = (value) => {
     setSelectedValue(value);
-    setCurrentAvatar(`/Avatars/avatar${value}.png`); // Update currentAvatar
   };
 
   return (
@@ -33,7 +54,7 @@ const AvatarComponent = () => {
       <Card sx={{ maxWidth: 345, marginLeft: 10 }}>
         <CardMedia
           component="img"
-          image={currentAvatar} // Use currentAvatar here
+          image={`/Avatars/avatar${selectedValue}.png`} // Use currentAvatar here
           title="avatar"
         />
         <CardContent>
@@ -41,13 +62,19 @@ const AvatarComponent = () => {
             {localStorage.getItem("username")}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Lizards are a widespread group of squamate reptiles, with over 6,000
-            species.
+            User Info
           </Typography>
         </CardContent>
         <CardActions>
           <Button onClick={handleOpen} sx={{ margin: "auto" }} size="small">
             Change Avatar
+          </Button>
+          <Button
+            onClick={() =>handleSaveAvatar(selectedValue)}
+            sx={{ margin: "auto" }}
+            size="small"
+          >
+            Save Avatar
           </Button>
         </CardActions>
       </Card>
